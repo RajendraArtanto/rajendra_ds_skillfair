@@ -10,7 +10,6 @@ Original file is located at
 
 Oleh : Rajendra Artanto Wiryawan Sujana
 
-# 1. IMPORT LIBRARY
 """
 
 import numpy as np
@@ -23,9 +22,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 from imblearn.over_sampling import SMOTE
 
-"""# 2. LOAD DATASET"""
-
-# Load Dataset
 breast_cancer = datasets.load_breast_cancer()
 X = breast_cancer.data
 y = breast_cancer.target
@@ -33,15 +29,10 @@ y = breast_cancer.target
 df_X = pd.DataFrame(X, columns=breast_cancer.feature_names)
 df_y = pd.Series(y, name='target')
 
-# Gabungkan fitur dan target dalam satu dataframe
 df = pd.concat([df_X, df_y], axis=1)
-
-"""# 3. Exploratory Data Analysis (EDA)"""
 
 import warnings
 warnings.filterwarnings("ignore")
-
-"""a. Countplot"""
 
 plt.figure(figsize=(6, 4))
 sns.countplot(x="target", data=df, palette="pastel")
@@ -52,24 +43,14 @@ plt.show()
 class_distribution = df_y.value_counts(normalize=True) * 100
 print(class_distribution)
 
-"""b. Heatmap"""
-
-# Korelasi antar fitur
 plt.figure(figsize=(12, 6))
 sns.heatmap(df.corr(), cmap="coolwarm", linewidths=0.5)
 plt.title("Korelasi Antar Fitur")
 plt.show()
 
-"""# 4. Preprocessing Data
-
-a. Teknik SMOTE
-"""
-
-# Menyeimbangkan dataset dengan SMOTE sebelum train-test split
 smote = SMOTE(random_state=42)
 X_resampled, y_resampled = smote.fit_resample(df_X, df_y)
 
-# Cek distribusi kelas setelah SMOTE
 plt.figure(figsize=(6, 4))
 sns.countplot(x=y_resampled, palette="pastel")
 plt.title("Distribusi Kelas Target Setelah SMOTE")
@@ -79,14 +60,8 @@ plt.show()
 class_distribution = y_resampled.value_counts(normalize=True) * 100
 print(class_distribution)
 
-"""b. Split Data"""
-
-# Split Data setelah balancing
 X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
-"""# 5. Generate ML Model"""
-
-# Hyperparameter Tuning dengan GridSearchCV
 param_grid = {
     'n_estimators': [50, 100, 150],
     'learning_rate': [0.01, 0.1, 0.2],
@@ -97,37 +72,27 @@ gbc = GradientBoostingClassifier()
 grid_search = GridSearchCV(gbc, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
 grid_search.fit(X_train, y_train)
 
-# Model dengan Parameter Terbaik
 best_gbc = grid_search.best_estimator_
 y_pred = best_gbc.predict(X_test)
 
-"""# 6. Evaluasi Model
-
-a. Classification Report
-"""
-
-# Evaluasi Model
 print("\n=== Classification Report ===")
 print(classification_report(y_test, y_pred, target_names=breast_cancer.target_names))
 
 from sklearn.metrics import classification_report
 
-# Mendapatkan classification report dalam bentuk dictionary
 report = classification_report(y_test, y_pred, output_dict=True)
 
-# Format hasil menjadi persen dengan 2 angka di belakang koma
 formatted_report = {}
 
 for key, value in report.items():
-    if isinstance(value, dict):  # Jika nilai adalah dictionary (kelas, macro avg, weighted avg)
+    if isinstance(value, dict): 
         formatted_report[key] = {
             metric: f"{value[metric] * 100:.2f}%" if metric != "support" else f"{value[metric]:.0f}"
             for metric in value
         }
-    else:  # Untuk accuracy yang langsung berupa angka
+    else: 
         formatted_report[key] = f"{value * 100:.2f}%"
 
-# Cetak hasil dengan format yang lebih rapi
 for key, value in formatted_report.items():
     if isinstance(value, dict):
         print(f"\nClass {key}:")
@@ -136,9 +101,6 @@ for key, value in formatted_report.items():
     else:
         print(f"\nClass accuracy:\n  Accuracy: {value}")
 
-"""b. Confusion Matrix"""
-
-# Confusion Matrix
 cf_matrix = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(6, 4))
 sns.heatmap(cf_matrix, annot=True, fmt='d', cmap="Blues",
@@ -149,9 +111,6 @@ plt.ylabel("Aktual")
 plt.title("Matriks Konfusi Gradient Boosting")
 plt.show()
 
-"""c. Feature Importance"""
-
-# Feature Importance
 feature_importance = pd.Series(best_gbc.feature_importances_, index=df_X.columns).sort_values(ascending=False)
 plt.figure(figsize=(10, 6))
 sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
