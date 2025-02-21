@@ -50,7 +50,7 @@ Breast cancer is one of the most common types of cancer affecting women worldwid
   - **Support Vector Machine (SVM)**
   - **Gradient Boosting Classifier**
 - **Hyperparameter tuning** was performed using **GridSearchCV**.
-- **Evaluation metrics**: Precision, Recall, F1-score, ROC-AUC, and Confusion Matrix.
+- **Evaluation metrics**: Precision, Recall, F1-score, and Confusion Matrix.
 - Feature Importance visualization helps understand the most influential predictors.
 
 ---
