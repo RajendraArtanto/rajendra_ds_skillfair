@@ -46,12 +46,9 @@ Breast cancer is one of the most common types of cancer affecting women worldwid
 
 ## Machine Learning Implementation:
 
-- Applied classification models:
-  - **Random Forest Classifier**
-  - **Support Vector Machine (SVM)**
-  - **Gradient Boosting Classifier**
+- Applied classification models : **Gradient Boosting Classifier**
 - **Hyperparameter tuning** was performed using **GridSearchCV**.
-- **Evaluation metrics**: Precision, Recall, F1-score, and Confusion Matrix.
+- **Evaluation metrics**: Classification Report and Confusion Matrix.
 - Feature Importance visualization helps understand the most influential predictors.
 
 ---
