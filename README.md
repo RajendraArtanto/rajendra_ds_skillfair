@@ -7,7 +7,7 @@ This project focuses on **Exploratory Data Analysis (EDA)** and **Machine Learni
 Breast cancer is one of the most common types of cancer affecting women worldwide. Early detection through accurate diagnosis plays a crucial role in increasing survival rates. This dataset consists of various **biopsy features** used to classify tumors as either **malignant** or **benign**.
 
 **Dataset Source:**\
-[Breast Cancer Wisconsin]([https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html))
+[Breast Cancer Wisconsin]([https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html])
 
 ---
 
