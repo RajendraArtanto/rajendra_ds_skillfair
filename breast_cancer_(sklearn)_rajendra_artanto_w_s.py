@@ -12,6 +12,7 @@ Oleh : Rajendra Artanto Wiryawan Sujana
 
 """
 
+# Import library yang diperlukan
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -22,68 +23,89 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 from imblearn.over_sampling import SMOTE
 
+# Load dataset kanker payudara dari Scikit-learn
 breast_cancer = datasets.load_breast_cancer()
-X = breast_cancer.data
-y = breast_cancer.target
+X = breast_cancer.data  # Fitur
+y = breast_cancer.target  # Target (label)
 
-df_X = pd.DataFrame(X, columns=breast_cancer.feature_names)
-df_y = pd.Series(y, name='target')
+# Konversi ke DataFrame untuk memudahkan analisis
+df_X = pd.DataFrame(X, columns=breast_cancer.feature_names)  # Data fitur
+df_y = pd.Series(y, name='target')  # Data target
 
+# Gabungkan fitur dan target menjadi satu DataFrame
 df = pd.concat([df_X, df_y], axis=1)
 
+# Menonaktifkan warning yang tidak perlu
 import warnings
 warnings.filterwarnings("ignore")
 
+# Visualisasi distribusi kelas sebelum diterapkan SMOTE
 plt.figure(figsize=(6, 4))
 sns.countplot(x="target", data=df, palette="pastel")
 plt.title("Distribusi Kelas Target Sebelum SMOTE")
 plt.xticks(ticks=[0, 1], labels=breast_cancer.target_names)
 plt.show()
 
+# Menampilkan distribusi kelas dalam persen
 class_distribution = df_y.value_counts(normalize=True) * 100
 print(class_distribution)
 
+# Menampilkan heatmap korelasi antar fitur
 plt.figure(figsize=(12, 6))
 sns.heatmap(df.corr(), cmap="coolwarm", linewidths=0.5)
 plt.title("Korelasi Antar Fitur")
 plt.show()
 
+# Menangani ketidakseimbangan kelas menggunakan SMOTE (Synthetic Minority Over-sampling Technique)
 smote = SMOTE(random_state=42)
 X_resampled, y_resampled = smote.fit_resample(df_X, df_y)
 
+# Visualisasi distribusi kelas setelah SMOTE
 plt.figure(figsize=(6, 4))
 sns.countplot(x=y_resampled, palette="pastel")
 plt.title("Distribusi Kelas Target Setelah SMOTE")
 plt.xticks(ticks=[0, 1], labels=breast_cancer.target_names)
 plt.show()
 
+# Menampilkan distribusi kelas setelah SMOTE dalam persen
 class_distribution = y_resampled.value_counts(normalize=True) * 100
 print(class_distribution)
 
+# Membagi data menjadi data latih dan data uji (80:20)
 X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
+# Menentukan parameter untuk Grid Search
 param_grid = {
-    'n_estimators': [50, 100, 150],
-    'learning_rate': [0.01, 0.1, 0.2],
-    'max_depth': [3, 4, 5]
+    'n_estimators': [50, 100, 150],  # Jumlah pohon dalam ensemble
+    'learning_rate': [0.01, 0.1, 0.2],  # Kecepatan pembelajaran
+    'max_depth': [3, 4, 5]  # Kedalaman maksimum pohon
 }
 
+# Membuat model Gradient Boosting Classifier
 gbc = GradientBoostingClassifier()
+
+# Mencari kombinasi parameter terbaik dengan GridSearchCV
 grid_search = GridSearchCV(gbc, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
 grid_search.fit(X_train, y_train)
 
+# Menggunakan model terbaik dari hasil pencarian
 best_gbc = grid_search.best_estimator_
+
+# Melakukan prediksi pada data uji
 y_pred = best_gbc.predict(X_test)
 
+# Menampilkan laporan klasifikasi
 print("\n=== Classification Report ===")
 print(classification_report(y_test, y_pred, target_names=breast_cancer.target_names))
 
 from sklearn.metrics import classification_report
 
+# Mengonversi laporan klasifikasi ke dalam format dictionary
 report = classification_report(y_test, y_pred, output_dict=True)
 
 formatted_report = {}
 
+# Memformat hasil laporan klasifikasi agar lebih mudah dibaca
 for key, value in report.items():
     if isinstance(value, dict): 
         formatted_report[key] = {
@@ -93,6 +115,7 @@ for key, value in report.items():
     else: 
         formatted_report[key] = f"{value * 100:.2f}%"
 
+# Menampilkan laporan klasifikasi yang sudah diformat
 for key, value in formatted_report.items():
     if isinstance(value, dict):
         print(f"\nClass {key}:")
@@ -101,6 +124,7 @@ for key, value in formatted_report.items():
     else:
         print(f"\nClass accuracy:\n  Accuracy: {value}")
 
+# Menampilkan matriks konfusi dalam bentuk heatmap
 cf_matrix = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(6, 4))
 sns.heatmap(cf_matrix, annot=True, fmt='d', cmap="Blues",
@@ -111,6 +135,7 @@ plt.ylabel("Aktual")
 plt.title("Matriks Konfusi Gradient Boosting")
 plt.show()
 
+# Menghitung dan menampilkan feature importance
 feature_importance = pd.Series(best_gbc.feature_importances_, index=df_X.columns).sort_values(ascending=False)
 plt.figure(figsize=(10, 6))
 sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
